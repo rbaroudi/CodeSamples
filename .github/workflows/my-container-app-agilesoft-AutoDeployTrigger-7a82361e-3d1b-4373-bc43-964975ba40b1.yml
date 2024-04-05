@@ -1,0 +1,43 @@
+name: Trigger auto deployment for my-container-app-agilesoft
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ master ]
+    paths:
+    - '**'
+    - '.github/workflows/my-container-app-agilesoft-AutoDeployTrigger-7a82361e-3d1b-4373-bc43-964975ba40b1.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.MYCONTAINERAPPAGILESOFT_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: 1mycontainerregistry.azurecr.io
+          registryUsername: ${{ secrets.MYCONTAINERAPPAGILESOFT_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.MYCONTAINERAPPAGILESOFT_REGISTRY_PASSWORD }}
+          containerAppName: my-container-app-agilesoft
+          resourceGroup: AZ-tes-AzureContainerApp
+          imageToBuild: 1mycontainerregistry.azurecr.io/my-container-app-agilesoft:${{ github.sha }}
+          
+            
+
+     
+
